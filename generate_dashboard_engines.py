@@ -3,7 +3,7 @@ Honeywell Binstock Program Scorecard — Dashboard Generator
 Honeywell Engines Site
 -----------------------------------------------------------
 Run:    python generate_dashboard_engines.py
-Output: index.html  (saved to the Honeywell Engines folder — ready for GitHub Pages)
+Output: index.html saved to the Honeywell Engines folder — ready for GitHub Pages
 
 Requirements:
     pip install pandas openpyxl
@@ -15,7 +15,7 @@ from datetime import datetime
 
 # ── CONFIG — only these 4 lines change per site ─────────────────────────────
 XLSX_PATH   = r"C:\Users\zn424f\OneDrive - The Boeing Company\Working KPIs\Bin Stratifications\Honeywell Engines\honeywell_engines_binstrat_202604.xlsx"
-SHEET_NAME  = "Honeywell Engines 2023-2025"
+SHEET_NAME  = "Bin Map Rpt_Engines"
 OUTPUT_DIR  = r"C:\Users\zn424f\OneDrive - The Boeing Company\Working KPIs\Bin Stratifications\Honeywell Engines"
 SITE_NAME   = "HONEYWELL ENGINES"
 # ────────────────────────────────────────────────────────────────────────────
@@ -43,16 +43,22 @@ def load_and_calculate(path, sheet):
     on_priced    = len(df[df['Contract Status'] == 'On-Contract : Priced'])
     off_contract = len(df[df['Contract Status'] == 'Off-Contract'])
     unpriced     = len(df[df['Contract Status'] == 'On-Contract : Unpriced'])
+    growth       = len(df[df['Contract Status'] == 'On-Contract : Growth Agreement'])
 
     df_active            = df[df['Bin Activity Status'] == 'Active']
     on_priced_active     = len(df_active[df_active['Contract Status'] == 'On-Contract : Priced'])
     off_contract_active  = len(df_active[df_active['Contract Status'] == 'Off-Contract'])
+    unpriced_active      = len(df_active[df_active['Contract Status'] == 'On-Contract : Unpriced'])
+    growth_active        = len(df_active[df_active['Contract Status'] == 'On-Contract : Growth Agreement'])
 
     on_contract_pct         = round(on_priced           / total  * 100, 1)
     off_contract_pct        = round(off_contract        / total  * 100, 2)
     unpriced_pct            = round(unpriced            / total  * 100, 2)
+    growth_pct              = round(growth              / total  * 100, 2)
     on_contract_active_pct  = round(on_priced_active    / active * 100, 1)
     off_contract_active_pct = round(off_contract_active / active * 100, 2)
+    unpriced_active_pct     = round(unpriced_active     / active * 100, 2)
+    growth_active_pct       = round(growth_active       / active * 100, 2)
 
     flag_delete = len(df[df['Action'] == 'DELETE'])
     flag_review = len(df[df['Action'] == 'Move to PO/BOM Review Required'])
@@ -65,7 +71,6 @@ def load_and_calculate(path, sheet):
     stocked_total       = total  - stockout_total
     stocked_active      = active - stockout_active
 
-    # SVG donut arc helpers (circumference for r=42: 2π×42 ≈ 263.9)
     C = 263.9
     def dash(pct):   return f"{round(C * pct / 100, 1)} {round(C - C * pct / 100, 1)}"
     def offset(pct): return f"-{round(C * pct / 100, 1)}"
@@ -80,19 +85,31 @@ def load_and_calculate(path, sheet):
         past_due_total=past_due_total, past_due_active=past_due_active,
         pd_pct_total=pd_pct_total, pd_pct_active=pd_pct_active,
         pd_risk_delta=int(pd_risk_delta),
-        on_priced=f"{on_priced:,}", off_contract=off_contract, unpriced=unpriced,
-        on_contract_pct=on_contract_pct, off_contract_pct=off_contract_pct, unpriced_pct=unpriced_pct,
+        on_priced=f"{on_priced:,}", off_contract=off_contract,
+        unpriced=unpriced, growth=growth,
+        on_contract_pct=on_contract_pct, off_contract_pct=off_contract_pct,
+        unpriced_pct=unpriced_pct, growth_pct=growth_pct,
         on_priced_active=f"{on_priced_active:,}", off_contract_active=off_contract_active,
-        on_contract_active_pct=on_contract_active_pct, off_contract_active_pct=off_contract_active_pct,
+        unpriced_active=unpriced_active, growth_active=growth_active,
+        on_contract_active_pct=on_contract_active_pct,
+        off_contract_active_pct=off_contract_active_pct,
+        unpriced_active_pct=unpriced_active_pct,
+        growth_active_pct=growth_active_pct,
         flag_delete=f"{flag_delete:,}", flag_review=f"{flag_review:,}",
         arc_priced_total=dash(on_contract_pct),
         arc_off_total=dash(off_contract_pct),
         off_offset_total=offset(on_contract_pct),
         arc_unpriced_total=dash(unpriced_pct),
         unpriced_offset_total=offset(on_contract_pct + off_contract_pct),
+        arc_growth_total=dash(growth_pct),
+        growth_offset_total=offset(on_contract_pct + off_contract_pct + unpriced_pct),
         arc_priced_active=dash(on_contract_active_pct),
         arc_off_active=dash(off_contract_active_pct),
         off_offset_active=offset(on_contract_active_pct),
+        arc_unpriced_active=dash(unpriced_active_pct),
+        unpriced_offset_active=offset(on_contract_active_pct + off_contract_active_pct),
+        arc_growth_active=dash(growth_active_pct),
+        growth_offset_active=offset(on_contract_active_pct + off_contract_active_pct + unpriced_active_pct),
         report_date=datetime.now().strftime("%B %Y"),
         file_name=os.path.basename(path),
     )
@@ -117,49 +134,23 @@ def build_html(d, site_name):
     --yellow:  #b45309;
     --red:     #b91c1c;
     --purple:  #6d28d9;
+    --teal:    #0e7490;
     --muted:   #374151;
     --text:    #0f172a;
     --subtext: #1e293b;
   }}
 
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{ background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 600; min-height: 100vh; padding: 0; overflow-x: hidden; }}
 
-  body {{
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    min-height: 100vh;
-    padding: 0;
-    overflow-x: hidden;
-  }}
-
-  .header {{
-    background: linear-gradient(135deg, #f0f4f8 0%, #e1eaf5 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 40px 24px;
-    display: flex; justify-content: space-between; align-items: flex-end;
-    position: relative; overflow: hidden;
-  }}
-  .header::before {{
-    content: ''; position: absolute; top: -60px; right: -60px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(3,105,161,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }}
-  .header-left h1 {{
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
-    letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase;
-  }}
+  .header {{ background: linear-gradient(135deg, #f0f4f8 0%, #e1eaf5 100%); border-bottom: 1px solid var(--border); padding: 28px 40px 24px; display: flex; justify-content: space-between; align-items: flex-end; position: relative; overflow: hidden; }}
+  .header::before {{ content: ''; position: absolute; top: -60px; right: -60px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(3,105,161,0.07) 0%, transparent 70%); pointer-events: none; }}
+  .header-left h1 {{ font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase; }}
   .header-left p {{ font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0.03em; margin-top: 4px; }}
   .header-right {{ text-align: right; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; line-height: 1.7; }}
   .header-right .site-tag {{ font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--accent); letter-spacing: 0.06em; }}
 
-  .def-banner {{
-    background: rgba(2,95,153,0.05); border-bottom: 1px solid var(--border);
-    padding: 11px 40px; display: flex; gap: 32px;
-    font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.01em;
-  }}
+  .def-banner {{ background: rgba(2,95,153,0.05); border-bottom: 1px solid var(--border); padding: 11px 40px; display: flex; gap: 32px; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.01em; }}
   .def-banner span {{ color: var(--subtext); }}
   .def-pill {{ display: inline-block; padding: 2px 9px; border-radius: 3px; font-size: 12px; font-weight: 700; margin-right: 6px; }}
   .pill-active  {{ background: rgba(22,163,74,0.10);  color: var(--green); border: 1px solid rgba(22,163,74,0.3); }}
@@ -171,10 +162,7 @@ def build_html(d, site_name):
   .row-3 {{ grid-template-columns: repeat(3, 1fr); }}
   .row-2 {{ grid-template-columns: repeat(2, 1fr); }}
 
-  .card {{
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    padding: 20px 22px; position: relative; overflow: hidden; transition: border-color 0.2s;
-  }}
+  .card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 22px; position: relative; overflow: hidden; transition: border-color 0.2s; }}
   .card:hover {{ border-color: #b0bfd4; }}
   .card-accent-top {{ position: absolute; top: 0; left: 0; right: 0; height: 2px; }}
   .card-label {{ font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }}
@@ -236,18 +224,15 @@ def build_html(d, site_name):
   .pd-block-val {{ font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--red); line-height: 1; }}
   .pd-block-sub {{ font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 4px; }}
 
-  .c-green {{ color: var(--green); }}  .c-red    {{ color: var(--red);    }}
-  .c-yellow{{ color: var(--yellow); }} .c-accent {{ color: var(--accent);  }}
-  .c-purple{{ color: var(--purple); }} .c-muted  {{ color: var(--muted);   }}
-  .bg-green {{ background: var(--green);  }} .bg-red    {{ background: var(--red);    }}
-  .bg-yellow{{ background: var(--yellow); }} .bg-accent {{ background: var(--accent);  }}
-  .bg-muted {{ background: var(--muted);  }}
+  .c-green  {{ color: var(--green);  }} .c-red    {{ color: var(--red);    }}
+  .c-yellow {{ color: var(--yellow); }} .c-accent {{ color: var(--accent);  }}
+  .c-purple {{ color: var(--purple); }} .c-muted  {{ color: var(--muted);   }}
+  .c-teal   {{ color: var(--teal);   }}
+  .bg-green  {{ background: var(--green);  }} .bg-red    {{ background: var(--red);    }}
+  .bg-yellow {{ background: var(--yellow); }} .bg-accent {{ background: var(--accent);  }}
+  .bg-muted  {{ background: var(--muted);  }} .bg-teal   {{ background: var(--teal);   }}
 
-  .footer {{
-    padding: 16px 40px; border-top: 1px solid var(--border);
-    display: flex; justify-content: space-between;
-    font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em;
-  }}
+  .footer {{ padding: 16px 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; }}
 
   @media (max-width: 900px) {{
     .row-4 {{ grid-template-columns: repeat(2, 1fr); }}
@@ -368,7 +353,7 @@ def build_html(d, site_name):
           </div>
         </div>
         <div style="margin-top:12px; font-size:13px; font-weight:600; color:var(--muted); line-height:1.6; border-top:1px solid var(--border); padding-top:10px;">
-          <span style="color:var(--red);">▲ Active-lens risk is {d['pd_risk_delta']}% higher</span> than total-map view. Reporting against total map understates exposure — active-only lens is the operationally honest metric for leadership.
+          <span style="color:var(--red);">▲ Active-lens risk is {d['pd_risk_delta']}% higher</span> than total-map view. Reporting against total map significantly understates exposure — active-only lens is the operationally honest metric for leadership.
         </div>
       </div>
       <div class="card">
@@ -416,6 +401,7 @@ def build_html(d, site_name):
               <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14" stroke-dasharray="{d['arc_priced_total']}" stroke-dashoffset="0" transform="rotate(-90 55 55)" opacity="0.85"/>
               <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14" stroke-dasharray="{d['arc_off_total']}" stroke-dashoffset="{d['off_offset_total']}" transform="rotate(-90 55 55)" opacity="0.9"/>
               <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14" stroke-dasharray="{d['arc_unpriced_total']}" stroke-dashoffset="{d['unpriced_offset_total']}" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14" stroke-dasharray="{d['arc_growth_total']}" stroke-dashoffset="{d['growth_offset_total']}" transform="rotate(-90 55 55)" opacity="0.9"/>
             </svg>
             <div class="donut-center">
               <div class="donut-center-val">{d['on_contract_pct']}%</div>
@@ -424,8 +410,9 @@ def build_html(d, site_name):
           </div>
           <div class="contract-legend">
             <div class="legend-row"><div class="legend-dot bg-green"></div><div class="legend-name">On-Contract · Priced</div><span class="legend-count c-green">{d['on_priced']}</span><span class="legend-pct">{d['on_contract_pct']}%</span></div>
-            <div class="legend-row"><div class="legend-dot bg-red"></div><div class="legend-name">Off-Contract</div><span class="legend-count c-red">{d['off_contract']}</span><span class="legend-pct">{d['off_contract_pct']}%</span></div>
             <div class="legend-row"><div class="legend-dot bg-yellow"></div><div class="legend-name">On-Contract · Unpriced</div><span class="legend-count c-yellow">{d['unpriced']}</span><span class="legend-pct">{d['unpriced_pct']}%</span></div>
+            <div class="legend-row"><div class="legend-dot bg-red"></div><div class="legend-name">Off-Contract</div><span class="legend-count c-red">{d['off_contract']}</span><span class="legend-pct">{d['off_contract_pct']}%</span></div>
+            <div class="legend-row"><div class="legend-dot bg-teal"></div><div class="legend-name">Growth Agreement</div><span class="legend-count c-teal">{d['growth']}</span><span class="legend-pct">{d['growth_pct']}%</span></div>
           </div>
         </div>
       </div>
@@ -438,6 +425,8 @@ def build_html(d, site_name):
               <circle cx="55" cy="55" r="42" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14"/>
               <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14" stroke-dasharray="{d['arc_priced_active']}" stroke-dashoffset="0" transform="rotate(-90 55 55)" opacity="0.85"/>
               <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14" stroke-dasharray="{d['arc_off_active']}" stroke-dashoffset="{d['off_offset_active']}" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14" stroke-dasharray="{d['arc_unpriced_active']}" stroke-dashoffset="{d['unpriced_offset_active']}" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14" stroke-dasharray="{d['arc_growth_active']}" stroke-dashoffset="{d['growth_offset_active']}" transform="rotate(-90 55 55)" opacity="0.9"/>
             </svg>
             <div class="donut-center">
               <div class="donut-center-val">{d['on_contract_active_pct']}%</div>
@@ -446,8 +435,9 @@ def build_html(d, site_name):
           </div>
           <div class="contract-legend">
             <div class="legend-row"><div class="legend-dot bg-green"></div><div class="legend-name">On-Contract · Priced</div><span class="legend-count c-green">{d['on_priced_active']}</span><span class="legend-pct">{d['on_contract_active_pct']}%</span></div>
+            <div class="legend-row"><div class="legend-dot bg-yellow"></div><div class="legend-name">On-Contract · Unpriced</div><span class="legend-count c-yellow">{d['unpriced_active']}</span><span class="legend-pct">{d['unpriced_active_pct']}%</span></div>
             <div class="legend-row"><div class="legend-dot bg-red"></div><div class="legend-name">Off-Contract</div><span class="legend-count c-red">{d['off_contract_active']}</span><span class="legend-pct">{d['off_contract_active_pct']}%</span></div>
-            <div class="legend-row" style="opacity:0.4;"><div class="legend-dot" style="background:var(--muted);"></div><div class="legend-name">Unpriced (in inactive)</div><span class="legend-count">—</span></div>
+            <div class="legend-row"><div class="legend-dot bg-teal"></div><div class="legend-name">Growth Agreement</div><span class="legend-count c-teal">{d['growth_active']}</span><span class="legend-pct">{d['growth_active_pct']}%</span></div>
           </div>
         </div>
       </div>
@@ -458,6 +448,7 @@ def build_html(d, site_name):
           <div class="risk-row"><div class="risk-label">Off-Contract (Total Map)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-red" style="width:{d['off_contract_pct']}%;"></div></div></div><div class="risk-value c-red">{d['off_contract_pct']}%</div><div class="risk-count c-muted">{d['off_contract']} bins</div></div>
           <div class="risk-row"><div class="risk-label">Off-Contract (Active Only)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-red" style="width:{d['off_contract_active_pct']}%;"></div></div></div><div class="risk-value c-red">{d['off_contract_active_pct']}%</div><div class="risk-count c-muted">{d['off_contract_active']} bins</div></div>
           <div class="risk-row"><div class="risk-label">Unpriced (Total Map)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-yellow" style="width:{d['unpriced_pct']}%;"></div></div></div><div class="risk-value c-yellow">{d['unpriced_pct']}%</div><div class="risk-count c-muted">{d['unpriced']} bins</div></div>
+          <div class="risk-row"><div class="risk-label">Unpriced (Active Only)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-yellow" style="width:{d['unpriced_active_pct']}%;"></div></div></div><div class="risk-value c-yellow">{d['unpriced_active_pct']}%</div><div class="risk-count c-muted">{d['unpriced_active']} bins</div></div>
           <div class="risk-row"><div class="risk-label">Past Due (Active Lens)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-red" style="width:{d['pd_pct_active']}%;"></div></div></div><div class="risk-value c-red">{d['pd_pct_active']}%</div><div class="risk-count c-muted">{d['past_due_active']} bins</div></div>
           <div class="risk-row"><div class="risk-label">Stockout (Active Lens)</div><div class="risk-bar-wrap"><div class="risk-bar-bg"><div class="risk-bar-inner bg-red" style="width:{d['stockout_pct_active']}%;"></div></div></div><div class="risk-value c-red">{d['stockout_pct_active']}%</div><div class="risk-count c-muted">{d['stockout_active']} bins</div></div>
         </div>
@@ -498,7 +489,7 @@ if __name__ == "__main__":
     print(f"Reading: {XLSX_PATH}")
     data = load_and_calculate(XLSX_PATH, SHEET_NAME)
     html = build_html(data, SITE_NAME)
-    output_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE)
+    output_path = os.path.join(OUTPUT_DIR, "index.html")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Dashboard generated: {output_path}")
