@@ -23,43 +23,16 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 600; min-height: 100vh; padding: 0; overflow-x: hidden; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    min-height: 100vh;
-    padding: 0;
-    overflow-x: hidden;
-  }
-
-  .header {
-    background: linear-gradient(135deg, #f0f4f8 0%, #e1eaf5 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 40px 24px;
-    display: flex; justify-content: space-between; align-items: flex-end;
-    position: relative; overflow: hidden;
-  }
-  .header::before {
-    content: ''; position: absolute; top: -60px; right: -60px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(3,105,161,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-left h1 {
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
-    letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase;
-  }
+  .header { background: linear-gradient(135deg, #f0f4f8 0%, #e1eaf5 100%); border-bottom: 1px solid var(--border); padding: 28px 40px 24px; display: flex; justify-content: space-between; align-items: flex-end; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(3,105,161,0.07) 0%, transparent 70%); pointer-events: none; }
+  .header-left h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase; }
   .header-left p { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0.03em; margin-top: 4px; }
   .header-right { text-align: right; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; line-height: 1.7; }
   .header-right .site-tag { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--accent); letter-spacing: 0.06em; }
 
-  .def-banner {
-    background: rgba(2,95,153,0.05); border-bottom: 1px solid var(--border);
-    padding: 11px 40px; display: flex; gap: 32px;
-    font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.01em;
-  }
+  .def-banner { background: rgba(2,95,153,0.05); border-bottom: 1px solid var(--border); padding: 11px 40px; display: flex; gap: 32px; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.01em; }
   .def-banner span { color: var(--subtext); }
   .def-pill { display: inline-block; padding: 2px 9px; border-radius: 3px; font-size: 12px; font-weight: 700; margin-right: 6px; }
   .pill-active  { background: rgba(22,163,74,0.10);  color: var(--green); border: 1px solid rgba(22,163,74,0.3); }
@@ -71,10 +44,7 @@
   .row-3 { grid-template-columns: repeat(3, 1fr); }
   .row-2 { grid-template-columns: repeat(2, 1fr); }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    padding: 20px 22px; position: relative; overflow: hidden; transition: border-color 0.2s;
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 22px; position: relative; overflow: hidden; transition: border-color 0.2s; }
   .card:hover { border-color: #b0bfd4; }
   .card-accent-top { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
   .card-label { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
@@ -144,11 +114,58 @@
   .bg-yellow { background: var(--yellow); } .bg-accent { background: var(--accent);  }
   .bg-muted  { background: var(--muted);  } .bg-teal   { background: var(--teal);   }
 
-  .footer {
-    padding: 16px 40px; border-top: 1px solid var(--border);
-    display: flex; justify-content: space-between;
-    font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em;
+
+  .disclosure {
+    background: linear-gradient(135deg, #0a2a4a 0%, #0d3561 100%);
+    border-top: 2px solid #1a5080;
+    padding: 16px 40px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
   }
+  .disc-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 1px;
+  }
+  .disc-text {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+  }
+  .disc-prop {
+    font-weight: 700;
+    color: rgba(255,255,255,0.95);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .disc-divider {
+    width: 1px;
+    background: rgba(255,255,255,0.18);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+
+  .footer { padding: 16px 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.02em; }
 
   @media (max-width: 900px) {
     .row-4 { grid-template-columns: repeat(2, 1fr); }
@@ -181,7 +198,6 @@
 
 <div class="dashboard">
 
-  <!-- ROW 1: Site Overview -->
   <div>
     <div class="section-header"><span class="section-title">Site Overview</span><div class="section-line"></div></div>
     <div style="margin-top:12px;" class="row row-4">
@@ -212,7 +228,6 @@
     </div>
   </div>
 
-  <!-- ROW 2: Fill Rate & Stockout -->
   <div>
     <div class="section-header"><span class="section-title">Fill Rate &amp; Stockout — Two Lenses</span><div class="section-line"></div></div>
     <div style="margin-top:12px;" class="row row-2">
@@ -253,7 +268,6 @@
     </div>
   </div>
 
-  <!-- ROW 3: Past Due Risk + Bin Activity -->
   <div>
     <div class="section-header"><span class="section-title">Past Due Risk Exposure</span><div class="section-line"></div></div>
     <div style="margin-top:12px;" class="row row-2">
@@ -307,30 +321,20 @@
     </div>
   </div>
 
-  <!-- ROW 4: Contract Status -->
   <div>
     <div class="section-header"><span class="section-title">Contract Status</span><div class="section-line"></div></div>
     <div style="margin-top:12px;" class="row row-3">
 
-      <!-- Total Map donut -->
       <div class="card">
         <div class="card-label">Contract Status — Total Bin Map</div>
         <div class="contract-layout" style="margin-top:10px;">
           <div class="donut-wrap">
             <svg width="110" height="110" viewBox="0 0 110 110">
               <circle cx="55" cy="55" r="42" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14"
-                stroke-dasharray="248.1 15.8" stroke-dashoffset="0"
-                transform="rotate(-90 55 55)" opacity="0.85"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14"
-                stroke-dasharray="4.3 259.6" stroke-dashoffset="-248.1"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14"
-                stroke-dasharray="11.1 252.8" stroke-dashoffset="-252.4"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14"
-                stroke-dasharray="0.5 263.4" stroke-dashoffset="-263.5"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14" stroke-dasharray="248.1 15.8" stroke-dashoffset="0" transform="rotate(-90 55 55)" opacity="0.85"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14" stroke-dasharray="4.3 259.6" stroke-dashoffset="-248.1" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14" stroke-dasharray="11.1 252.8" stroke-dashoffset="-252.4" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14" stroke-dasharray="0.5 263.4" stroke-dashoffset="-263.5" transform="rotate(-90 55 55)" opacity="0.9"/>
             </svg>
             <div class="donut-center">
               <div class="donut-center-val">94.0%</div>
@@ -346,25 +350,16 @@
         </div>
       </div>
 
-      <!-- Active Only donut -->
       <div class="card">
         <div class="card-label">Contract Status — Active Bins Only</div>
         <div class="contract-layout" style="margin-top:10px;">
           <div class="donut-wrap">
             <svg width="110" height="110" viewBox="0 0 110 110">
               <circle cx="55" cy="55" r="42" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14"
-                stroke-dasharray="257.0 6.9" stroke-dashoffset="0"
-                transform="rotate(-90 55 55)" opacity="0.85"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14"
-                stroke-dasharray="1.9 262.0" stroke-dashoffset="-257.0"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14"
-                stroke-dasharray="4.6 259.3" stroke-dashoffset="-258.9"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14"
-                stroke-dasharray="0.2 263.7" stroke-dashoffset="-263.6"
-                transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#15803d" stroke-width="14" stroke-dasharray="257.0 6.9" stroke-dashoffset="0" transform="rotate(-90 55 55)" opacity="0.85"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#b91c1c" stroke-width="14" stroke-dasharray="1.9 262.0" stroke-dashoffset="-257.0" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#b45309" stroke-width="14" stroke-dasharray="4.6 259.3" stroke-dashoffset="-258.9" transform="rotate(-90 55 55)" opacity="0.9"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#0e7490" stroke-width="14" stroke-dasharray="0.2 263.7" stroke-dashoffset="-263.6" transform="rotate(-90 55 55)" opacity="0.9"/>
             </svg>
             <div class="donut-center">
               <div class="donut-center-val">97.4%</div>
@@ -380,7 +375,6 @@
         </div>
       </div>
 
-      <!-- Contract Risk Summary -->
       <div class="card">
         <div class="card-label">Contract Risk Summary</div>
         <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
@@ -396,6 +390,19 @@
     </div>
   </div>
 
+</div>
+
+
+<div class="disclosure">
+  <div class="disc-icon">&#9432;</div>
+  <div class="disc-text">
+    <span class="disc-prop">Proprietary</span>
+    The information contained herein is proprietary to The Boeing Company and shall not be reproduced or disclosed in whole or in part except when such user possesses direct written authorization from The Boeing Company.
+  </div>
+  <div class="disc-divider"></div>
+  <div class="disc-text">
+    The statements contained herein are based on good faith assumptions and are to be used for general information purposes only. These statements do not constitute an offer, promise, warranty or guarantee of performance.
+  </div>
 </div>
 
 <div class="footer">
